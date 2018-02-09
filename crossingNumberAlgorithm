@@ -1,0 +1,248 @@
+import java.io.*;
+import java.util.Vector;
+
+/**
+ * Class for saving position of point
+ * It has getter and setter methods
+ */
+class Point {
+    private double x, y;
+
+    public double get_x () {
+        return x;
+    }
+
+    public double get_y () {
+        return y;
+    }
+
+    public void set_x (double new_x) {
+        this.x = new_x;
+    }
+
+    public void set_y (double new_y) {
+        this.y = new_y;
+    }
+}
+
+/**
+ * This algorithm go across all point that we have
+ * and it counts intersections
+ */
+public class CrossingNumberAlgorithm {
+    static Vector vector = new Vector();
+    static Point current_point = new Point();
+    static double max = -1;
+
+    /**
+     * It takes current point. Type Point
+     * @param point
+     * @return
+     */
+    public static boolean CrossChecker(Point point) {
+        int crossings = 0;
+        Point p1, p2;
+
+        for (int i = 0; i < vector.size()-1; i++) {
+            p1 = (Point)vector.get(i);
+            p2 = (Point)vector.get(i+1);
+
+            // Checks that point on line of shape
+            if (p2.get_x() - p1.get_x() != 0 && p2.get_y()-p1.get_x() != 0) {
+                if ((point.get_x() - p1.get_x()) / (p2.get_x() - p1.get_x()) ==
+                        (point.get_y() - p1.get_y()) / (p2.get_y() - p1.get_y())) {
+                    return true;
+                }
+            }
+
+            // Checks that current point is equal one of vertex of shape
+            if (p1.get_x() == point.get_x() && p1.get_y() == point.get_y()) {
+                return true;
+            }
+
+            // Checks that point cross line
+            if ((point.get_y() <= p1.get_y() && point.get_y() >= p2.get_y() ||
+                    point.get_y() >= p1.get_y() && point.get_y() <= p2.get_y())&&
+                    point.get_x() >= (p2.get_x() - p1.get_x())*(point.get_y()-p1.get_y())/(p2.get_y()-p1.get_y()) + p1.get_x()) {
+                crossings++;
+            }
+
+            // Checks that point.y doesn't equal y of current point
+            if (point.get_y() == p1.get_y() && point.get_x() > p1.get_x()) {
+                crossings--;
+            }
+        }
+
+        p1 = (Point) vector.firstElement();
+        p2 = (Point) vector.lastElement();
+
+        // Checks that point crossing line between first and last points
+        if ((point.get_y() <= p1.get_y() && point.get_y() >= p2.get_y() ||
+                point.get_y() >= p1.get_y() && point.get_y() <= p2.get_y()) &&
+                point.get_x() >= (p2.get_x() - p1.get_x())*(point.get_y()-p1.get_y())/(p2.get_y()-p1.get_y()) + p1.get_x()) {
+            crossings++;
+        }
+
+        // Checks that point.y doesn't equal y of current point
+        if (point.get_y() == p2.get_y() && point.get_x() > p1.get_x()) {
+            crossings--;
+        }
+
+        // If point crossed shape odd times that means it inside
+        // Else outside
+        if (crossings % 2 == 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * This method finds the highest value of points
+     * This max value will be max value of randomly chose point
+     * @param number
+     */
+    static void find_max(double number) {
+        if (number > max) {
+            max = number;
+        }
+    }
+
+    /**
+     * Parse input points
+     * @throws IOException
+     */
+    public static void parser() throws IOException {
+        BufferedReader sc = new BufferedReader(new FileReader("input.txt"));
+        char temp = (char) sc.read();
+
+        while (temp != '}') {
+
+            temp = (char) sc.read();
+            String number = "";
+            Point point = new Point();
+            temp = (char) sc.read();
+
+            while (temp != ',') {
+                number += temp;
+                temp = (char) sc.read();
+            }
+
+            point.set_x(Integer.valueOf(number));
+            find_max(point.get_x());
+
+            number = "";
+            temp = (char) sc.read();
+
+
+            while (temp != ')') {
+                number += temp;
+                temp = (char) sc.read();
+            }
+
+            point.set_y(Integer.valueOf(number));
+            find_max(point.get_y());
+
+            vector.add(point);
+
+            temp = (char) sc.read();
+        }
+
+        temp = (char) sc.read();
+        String number = "";
+        temp = (char) sc.read();
+        temp = (char) sc.read();
+        temp = (char) sc.read();
+
+        while (temp != ',') {
+            number += temp;
+            temp = (char) sc.read();
+        }
+
+        current_point.set_x(Integer.valueOf(number));
+        find_max(current_point.get_x());
+
+        number = "";
+        temp = (char) sc.read();
+        number += temp;
+        temp = (char) sc.read();
+
+        while (temp != ')') {
+            number += temp;
+            temp = (char) sc.read();
+        }
+
+        current_point.set_y(Integer.valueOf(number));
+        find_max(current_point.get_y());
+    }
+
+    /**
+     * It uses method CrossChecker() to check position of point
+     */
+    public static void place_of_point() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt"))) {
+            if (CrossChecker(current_point)) {
+                bw.write("Yes\n");
+                bw.close();
+            } else {
+                bw.write("No\n");
+                bw.close();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * This method calculate area of shape
+     * @throws IOException
+     */
+    public static void calculating_area() throws IOException {
+        Double S_old, S_new = 1.0;
+        int inside = 1, outside = 1;
+
+        do {
+            S_old = S_new;
+
+            // Before check program create 100000 random points for
+            // escaping some mistakes
+            for (int i = 0; i < 100000; i++) {
+                Point point = new Point();
+                point.set_x(Math.random() * max);
+                point.set_y(Math.random() * max);
+
+                if (CrossChecker(point)) {
+                    inside++;
+                } else {
+                    outside++;
+                }
+            }
+
+            S_new = max*max*inside/(inside+outside);
+        } while (Math.abs(S_old-S_new) >= 10e-5);
+
+        BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt", true));
+        S_new = Double.valueOf(Math.round(S_new * 10)) / 10;
+
+        // Add some not good code to come throw the tests
+        if (S_new % 1 == 0) {
+            bw.write(String.valueOf(S_new.intValue()));
+        } else {
+            bw.write((S_new).toString());
+        }
+        bw.close();
+    }
+
+    /**
+     * First, parse data
+     * Second, check where point place
+     * Third, calculate area
+     * @param args
+     */
+    public static void main(String[] args) throws IOException {
+        parser();
+        place_of_point();
+        calculating_area();
+    }
+}

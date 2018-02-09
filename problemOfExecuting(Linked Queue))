@@ -1,0 +1,106 @@
+import java.io.*;
+import java.util.LinkedList;
+import java.util.Scanner;
+
+/**
+ * Class LinkedQueue based on class LinkedList
+ *
+ * To solve this problem i need 3 methods:
+ * 1. Size - return current size of queue
+ * 2. Dequeue  - to watch the first element end delete it
+ * 3. Push - to add element in end
+ */
+class LinkedQueue<E> {
+    /** Linked list */
+    LinkedList<E> list = new LinkedList<>();
+
+    /** Return size of list */
+    public int size() {
+        return list.size();
+    }
+
+    /** Add element to list */
+    public void push(E element) {
+        list.addLast(element);
+    }
+
+    /** Return first element of list and delete it */
+    public E dequeue() {
+        return list.removeFirst();
+    }
+}
+
+/**
+ * It have two field - people (DynamicQueue) and k (integer)
+ * Also it have 3 methods - parser(), find_survivor(), main()
+ */
+public class ProblemOfExecuting {
+
+    /**
+     * Linked Queue of people
+     */
+    static  LinkedQueue<String>people = new LinkedQueue<>();
+
+    /**
+     * Steps for execution
+     */
+    static int k;
+
+    /**
+     * Parse data from "input.txt"
+     * @throws FileNotFoundException
+     */
+    public static void parser() throws FileNotFoundException {
+        Scanner sc = new Scanner(new FileReader("input.txt"));
+
+        // While have person add it to dynamic queue
+        while (sc.hasNext() && !sc.hasNextInt()) {
+            people.push(sc.next());
+        }
+
+        // Read steps
+        k = sc.nextInt();
+    }
+
+    /**
+     * To find survivor i add k-1 times first person to end of queue
+     * After i pop() first person
+     *
+     * Do it while i have people.size() != 1
+     * @throws IOException
+     */
+    public static void find_survivor() throws IOException {
+
+        /** Do it while in list won't be only one man */
+        while (people.size() != 1) {
+
+            /** Delete first man from list and put in to the end if it again */
+            for (int i = 0; i < k-1; i++) {
+                people.push(people.dequeue());
+            }
+
+            /** Delete kTH man from queue */
+            people.dequeue();
+        }
+
+        // Write into "output.txt"
+        BufferedWriter bw = new BufferedWriter(new FileWriter("output.txt"));
+        bw.write(people.dequeue());
+        bw.close();
+    }
+
+    /**
+     * First, parse data
+     * Second, find survivor and write it into file
+     * @param args
+     * @throws IOException
+     */
+    public static void main(String[] args) throws IOException {
+
+        /** Parse data */
+        parser();
+
+        /** Solve problem and find survivor */
+        find_survivor();
+    }
+}

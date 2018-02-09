@@ -1,0 +1,11 @@
+class Node {
+    Integer value, height;
+    Node left, right, parent;
+
+    Node() {
+        height = 0;
+        left = null;
+        right = null;
+        parent = null;
+    }
+}

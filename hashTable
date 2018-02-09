@@ -1,0 +1,238 @@
+import java.util.Vector;
+
+
+/**
+ * HashTable have methods get, put, remove, size, isEmpty, entrySet, keyset, values
+ * @param <E>
+ */
+public class HashTable<E> {
+    /** Size - current number of element inside HashTable, sizeOfTable - number of maximum variable */
+    private int size = 0, sizeOfTable = 10000;
+
+    /** There will be stored our values */
+    private E[] values =  (E[])new Object[sizeOfTable];
+
+    /** Vector of keys */
+    private Vector<String> keys = new Vector<String>();
+
+    /**
+     *  This hashFunction convert string to index that less then sizeOfTable
+     *  It take string and each value of char in ASCII it multiple on z in power of place, where
+     *  this char is staying.
+     *
+     *  5 4 3 2 1 0
+     *  s t r i n g => 's' * z^5 + 't' * z^4 + .......
+     */
+    private int hashFunction(String str) {
+        /**
+         *  Z - coefficient which equal english alphabet multiple by two
+         *  because we say that 'a' and 'A' are not equal
+         */
+        int z = 52;
+
+        /**
+         * Key where we will store huge number that we will take
+         * after using this algorithm
+         */
+        long key = 0L;
+
+        /**
+         * Main algorithm
+         */
+        for (int i = 0; i < str.length(); i++) {
+            key += str.charAt(i) * Math.pow(z, i);
+        }
+
+
+        /**
+         * Return remainder of the division by sizeOfTable, because index
+         * in array mustn't be more than size of this array
+         */
+        return (int) (key % sizeOfTable);
+    }
+
+    /**
+     * This method checks have we key in our table or not
+     */
+    public boolean hasKey(String key) {
+
+        /**
+         * It's just run throw all elements in key's array
+         */
+        for (int i = 0; i < keys.size(); i++)
+            if (keys.elementAt(i).equals(key))
+                return true;
+
+        return false;
+    }
+
+
+    /**
+     * We need this method to handle collisions
+     * @param key
+     * @param value
+     */
+    private void quadraticProbingInsertion(String key, E value) {
+
+        /**
+         * We calculate hashFunction(key) here for not do it later or,
+         * it would be worse, not to calculate it many times again and again
+         */
+        int placeInValuesArray = hashFunction(key);
+
+        /**
+         * This algorithm trie's to find free space in array if one of our cell
+         * that we need is already fulled
+         */
+        for (int i = 0; i < sizeOfTable; i++) {
+            placeInValuesArray = (int) ((placeInValuesArray + Math.pow(i, 2))%sizeOfTable);
+
+            /**
+             * If at this position we have no element put our element here
+             */
+            if (values[placeInValuesArray] == null) {
+                values[placeInValuesArray] = value;
+                keys.addElement(key);
+                size++;
+                break;
+            }
+        }
+    }
+
+    /**
+     * This method need for us to find our values to avoid collisions
+     * @param key
+     * @return
+     */
+    private E searchInQuadraticProbing(String key) {
+        /**
+         * We again calculate hashFunction earlier
+         */
+        int resultOfHashFunction = hashFunction(key);
+
+        /**
+         * If we have value at this position - return it, else go further.
+         * If i will be bigger than sizeOfTable we say that's we haven't go element
+         */
+        for (int i = 0; i < sizeOfTable; i++) {
+            int curKey = (int) (resultOfHashFunction + Math.pow(i, 2)) % sizeOfTable;
+            if (values[curKey] != null) {
+                return values[curKey];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * This method return value in this key
+     * @param key
+     * @return
+     */
+    public E get(String key) {
+        return searchInQuadraticProbing(key);
+    }
+
+    /**
+     * This method change value of element at this position by using key
+     * @param key
+     * @param value
+     */
+    public void changeValue(String key, E value) {
+        if (this.hasKey((String) key)){
+            values[hashFunction(key)] = value;
+        }
+    }
+
+    /**
+     * Put element in one position by using quadraticProbingInsertion
+     * @param key
+     * @param value
+     */
+    public void put(String key, E value) {
+        quadraticProbingInsertion(key, value);
+    }
+
+    /**
+     * Remove element on this key. Just make it equal null
+     * @param key
+     */
+    public void remove (String key) {
+        values[hashFunction(key)] = null;
+    }
+
+    /**
+     * This method return empty your table or not
+     * @return
+     */
+    public boolean isEmpty () {
+        if (size != 0) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * This method return set of keys
+     * @return
+     */
+    public String keyset() {
+        String str = "";
+
+        for (int i = 0; i < keys.size(); i++) {
+            str += keys.elementAt(i) + " ";
+        }
+
+        return str;
+    }
+
+    /**
+     * This  method return all keys and values
+     * @return
+     */
+    public String entrySet() {
+        String str = "";
+
+        for (int i = 0; i < keys.size(); i++) {
+            str += keys.elementAt(i) + " " + values[hashFunction(keys.elementAt(i))] + "\n  ";
+        }
+
+        return str;
+    }
+
+    /**
+     * This method returns all values
+     * @return
+     */
+    public String values() {
+        String str = "";
+
+        for (int i = 0; i < keys.size(); i++) {
+            str += values[hashFunction(keys.elementAt(i))] + " ";
+        }
+
+        return str;
+    }
+
+    /**
+     * This method return maximum number of elements that go near, one-by-one
+     * @return
+     */
+    public int getMaxProbabingSequenceLength() {
+        int max_num = 0, num = 0;
+
+        for (int i = 0; i < values.length; i++) {
+            if (values[i] != null) {
+                num++;
+            } else {
+                if (num > max_num) {
+                    max_num = num;
+                }
+                num = 0;
+            }
+        }
+
+        return max_num;
+    }
+}

@@ -1,0 +1,376 @@
+/**
+ * Class Sorting contains 5 different algorithms fo sorting
+ */
+public class Sorting {
+
+    /**
+     * Bubble sort
+     * @param array
+     * @return
+     */
+    public int[] bubbleSort(int[] array) {
+
+        /**
+         * This algorithm  go from first to last (almost) element
+         * and the biggest one will be placed at the last position.
+         *
+         * After all iterations we will have sorted list of elements
+         */
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array.length - 1 - i; j++) {
+                if (array[j] > array[j + 1]) {
+                    int temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = array[i];
+                }
+            }
+        }
+
+        return array;
+    }
+
+    /**
+     * Selection sort
+     * @param array
+     * @return
+     */
+    public int[] selectionSort(int[] array) {
+
+        /**
+         * This algorithm search the least element and add  it at the current
+         * index.
+         *
+         * If it first iteration index would be equal 0
+         * If it second - 1
+         * And so on
+         */
+        for (int i = 0; i < array.length; i++) {
+
+            /**
+             * Our min variable is equal the maximum possible 32-bit integer in java
+             *
+             * By this we know that almost all elements except one that equal maimum
+             * number will always be less than it.
+             *
+             * And we can find the least of this element 100%
+             */
+            int min = Integer.MAX_VALUE, pointer = i;
+
+            for (int j = 0; j < array.length; j++) {
+                if (array[j] < min) {
+                    min = array[j];
+                    pointer = j;
+                }
+            }
+
+            /**
+             * If pointer didn't make any moves that we already have sorted array
+             * and we may and our work at this moment
+             *
+             * Otherwise - we need to change value of min variable and under point
+             */
+            if (pointer == i) {
+                break;
+            } else {
+
+                int temp = array[i];
+                array[i] = array[pointer];
+                array[pointer] = temp;
+
+            }
+        }
+
+        return array;
+    }
+
+    /**
+     * Insertion sort
+     * @param array
+     * @return
+     */
+    public int[] insertionSort(int[] array) {
+
+        /**
+         * This algorithm take element since second from array and check
+         * does that element less than all that goes before it
+         *
+         * If yes, change their place, just swap them
+         */
+        for (int i = 1; i < array.length; i++) {
+
+            for (int j = i - 1; j >= 0; j--) {
+
+                if (array[j + 1] < array[j]) {
+                    int temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                }
+            }
+        }
+
+        return array;
+    }
+
+    /**
+     * Private method quick sort to sort the input array
+     * @param array
+     * @param startIndex
+     * @param endIndex
+     */
+    private static void quickSort(int[] array, int startIndex, int endIndex) {
+
+        /**
+         * This algorithm works recursively
+         *
+         * First, we pick pivot, that will be at the middle of arrays and subarrays
+         *
+         * If our endIndex will be less than start index that our program end its
+         * work
+         */
+        if (endIndex <= startIndex) {
+            return;
+        }
+
+        int pivot = (endIndex + startIndex) / 2, tempStart = startIndex, tempEnd = endIndex;
+
+
+        while (tempStart < tempEnd) {
+
+            /**
+             * First, we search first element that placed before pivot
+             * that bigger than it
+             */
+            while (array[pivot] > array[tempStart] && tempStart < pivot) {
+                tempStart++;
+            }
+
+            /**
+             * Second, we search second element that placed after pivot
+             * that less than it
+             */
+            while (array[pivot] < array[tempEnd] && tempEnd > pivot) {
+                tempEnd--;
+            }
+
+            /**
+             * If tempEnd > tempStart than we need to swap to values that we have
+             * already found
+             */
+            if (tempEnd > tempStart) {
+                int temp = array[tempEnd];
+                array[tempEnd] = array[tempStart];
+                array[tempStart] = temp;
+
+                /**
+                 * After swapping we create two subarray that includes didn't sorted elements
+                 * and this algorithm makes again with them
+                 */
+                if (tempStart == pivot) {
+                    pivot = tempEnd;
+                } else if (tempEnd == pivot) {
+                    pivot = tempStart;
+                }
+            }
+        }
+
+        quickSort(array, startIndex, pivot);
+        quickSort(array, pivot+1, endIndex);
+    }
+
+
+    /**
+     * Quick sort
+     * @param array
+     * @return
+     */
+    public int[] quickSort(int[] array) {
+
+        /**
+         * This method start quick sort algorithm
+         */
+        quickSort(array, 0, array.length - 1);
+
+        return array;
+    }
+
+    /**
+     * This algorithm merge two different arrays into one
+     * @param array
+     * @param leftHalf
+     * @param rightHalf
+     */
+    private static void mergeTwoArray(int[] array, int[] leftHalf, int[] rightHalf) {
+
+        /**
+         * Pointers in our arrays
+         */
+        int pointerLeft = 0, pointerRight = 0, pointerArray = 0;
+
+        /**
+         * While we have values and into leftHalf array and into rightHalf array
+         * we add lowest into our array
+         */
+        while (pointerLeft < leftHalf.length && pointerRight < rightHalf.length) {
+
+            /**
+             * if lowest value placed into leftHalf array - add his value to
+             * array and increment pointerLeft to one
+             *
+             * Otherwise, do this with rightHalf
+             */
+            if (leftHalf[pointerLeft] < rightHalf[pointerRight]) {
+                array[pointerArray] = leftHalf[pointerLeft];
+                pointerLeft++;
+            } else {
+                array[pointerArray] = rightHalf[pointerRight];
+                pointerRight++;
+            }
+
+            pointerArray++;
+        }
+
+        /**
+         * When one of array will have no elements we just need to put all
+         * elements from second to our array
+         */
+        if (pointerLeft == leftHalf.length) {
+            if (rightHalf.length == 1) {
+                array[pointerArray] = rightHalf[0];
+            } else {
+
+                for (int i = pointerRight; i < rightHalf.length; i++) {
+                    array[pointerArray] = rightHalf[i];
+                    pointerArray++;
+                }
+
+            }
+        } else {
+            if (leftHalf.length == 0) {
+                array[pointerArray] = leftHalf[0];
+            } else {
+
+                for (int i = pointerLeft; i < leftHalf.length; i++) {
+                    array[pointerArray] = leftHalf[i];
+                    pointerArray++;
+                }
+
+            }
+
+        }
+
+    }
+
+
+    /**
+     * Merge sort works recursively
+     *
+     * First it divide all elements and after compare them and sort
+     * @return
+     */
+    public int[] mergeSort(int[] array) {
+
+        /**
+         * If current array have only one element, we have found that we need
+         */
+        if (array.length == 1) {
+            return array;
+        }
+
+        /**
+         * Divide that we get to two different array
+         */
+        int[] leftHalf = new int[array.length / 2], rightHalf = new int[array.length - array.length/2];
+
+        /**
+         * I need this if-else's to avoid some mistakes that i have got
+         * when my program worked
+         *
+         * Here we just copy elements from our main array two leftHalf array
+         */
+        if (array.length % 2 == 0) {
+            for (int i = 0; i < array.length / 2; i++) {
+                leftHalf[i] = array[i];
+            }
+        } else {
+            if (array.length / 2 == 1) {
+                leftHalf[0] = array[0];
+            } else {
+
+                for (int i = 0; i < array.length / 2; i++) {
+                    leftHalf[i] = array[i];
+                }
+
+            }
+        }
+
+        /**
+         * Here we copy value of array to rightHalf array
+         */
+        for (int i = 0; i < array.length - array.length / 2; i++) {
+            rightHalf[i] = array[i + array.length / 2];
+        }
+
+        /**
+         * Start this method again while wi didn't find the lowest element
+         */
+        mergeSort(leftHalf);
+        mergeSort(rightHalf);
+
+        /**
+         * This method merge two arrays into one
+         */
+        mergeTwoArray(array, rightHalf, leftHalf);
+
+        return array;
+    }
+
+
+
+//    private static void mergeTwoArray(int[] array, int[] tempArray, int leftEl, int middleEl, int rightEl) {
+//
+//        int pointerTempArray = leftEl;
+//
+//        while (leftEl <= middleEl - 1 && middleEl <= rightEl) {
+//
+//            if (array[leftEl] <= array[middleEl]) {
+//                tempArray[pointerTempArray] = array[leftEl];
+//                leftEl++;
+//            } else {
+//                tempArray[pointerTempArray] = array[middleEl];
+//                middleEl++;
+//            }
+//
+//            pointerTempArray++;
+//        }
+//
+//        for (int i = leftEl; i <= middleEl - 1; i++) {
+//            tempArray[i] = array[i];
+//        }
+//
+//        for (int i = middleEl; i <= rightEl; i++) {
+//            tempArray[i] = array[i];
+//        }
+//
+//        for (int i = 0; i < leftEl + rightEl; i++) {
+//            array[rightEl] = tempArray[rightEl];
+//            rightEl--;
+//        }
+//    }
+//
+//    private static void mergeSort(int[] array, int[] tempArray, int leftEl, int rightEl) {
+//
+//        if (leftEl < rightEl) {
+//
+//            int middleEl = (leftEl + rightEl) / 2;
+//
+//            mergeSort(array, tempArray, leftEl, middleEl);
+//            mergeSort(array, tempArray, middleEl + 1, rightEl);
+//
+//            mergeTwoArray(array, tempArray, leftEl, middleEl + 1, rightEl);
+//        }
+//    }
+//
+//    public void mergeSort(int[] array) {
+//        mergeSort(array, new int[array.length], 0, array.length - 1);
+//    }
+}
